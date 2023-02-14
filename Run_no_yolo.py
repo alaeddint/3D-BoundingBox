@@ -49,7 +49,7 @@ def main():
         model.eval()
 
     # defaults to /eval
-    dataset = Dataset(os.path.abspath(os.path.dirname(__file__)) + '/eval')
+    dataset = Dataset(os.path.abspath(os.path.dirname('C:/Users/aturkmen/PycharmProjects/3D-BoundingBox')) + '/eval')
     averages = ClassAverages.ClassAverages()
 
     all_images = dataset.all_objects()

@@ -14,7 +14,7 @@ import os
 def main():
 
     # hyper parameters
-    epochs = 100
+    epochs = 20
     batch_size = 8
     alpha = 0.6
     w = 0.4
@@ -31,10 +31,10 @@ def main():
     generator = data.DataLoader(dataset, **params)
 
     my_vgg = vgg.vgg19_bn(pretrained=True)
-    model = Model(features=my_vgg.features).cuda()
+    model = Model(features=my_vgg.features)
     opt_SGD = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-    conf_loss_func = nn.CrossEntropyLoss().cuda()
-    dim_loss_func = nn.MSELoss().cuda()
+    conf_loss_func = nn.CrossEntropyLoss()
+    dim_loss_func = nn.MSELoss()
     orient_loss_func = OrientationLoss
 
     # load any previous weights
@@ -69,11 +69,11 @@ def main():
         passes = 0
         for local_batch, local_labels in generator:
 
-            truth_orient = local_labels['Orientation'].float().cuda()
-            truth_conf = local_labels['Confidence'].long().cuda()
-            truth_dim = local_labels['Dimensions'].float().cuda()
+            truth_orient = local_labels['Orientation'].float()
+            truth_conf = local_labels['Confidence'].long()
+            truth_dim = local_labels['Dimensions'].float()
 
-            local_batch=local_batch.float().cuda()
+            local_batch=local_batch.float()
             [orient, conf, dim] = model(local_batch)
 
             orient_loss = orient_loss_func(orient, truth_orient, truth_conf)

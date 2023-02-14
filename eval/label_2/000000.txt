@@ -1,1 +1,4 @@
 Pedestrian 0.00 0 -0.20 712.40 143.00 810.73 307.92 1.89 0.48 1.20 1.84 1.47 8.41 0.01
+Package 0 0 -0.2 1431 510 1534 690 0.3 0.5 0.8 0.1 0.3 0.5 3
+
+name trunc occlusion alpha bbox4 dimension3 location3mt rot_y

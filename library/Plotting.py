@@ -78,7 +78,7 @@ def plot_3d_pts(img, pts, center, calib_file=None, cam_to_img=None, relative=Fal
 
 
 
-def plot_3d_box(img, cam_to_img, ry, dimension, center):
+def plot_3d_box(img, cam_to_img, ry, dimension, center, img_id):
 
     # plot_3d_pts(img, [center], center, calib_file=calib_file, cam_to_img=cam_to_img)
 
@@ -112,6 +112,7 @@ def plot_3d_box(img, cam_to_img, ry, dimension, center):
 
     cv2.line(img, front_mark[0], front_mark[3], cv_colors.BLUE.value, 1)
     cv2.line(img, front_mark[1], front_mark[2], cv_colors.BLUE.value, 1)
+    cv2.imwrite(f'{img_id}result.jpg', img)
 
 def plot_2d_box(img, box_2d):
     # create a square from the corners

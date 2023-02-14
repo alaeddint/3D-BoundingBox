@@ -25,6 +25,7 @@ from torch.autograd import Variable
 from torchvision.models import vgg
 
 import argparse
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -37,7 +38,7 @@ def str2bool(v):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--image-dir", default="eval/image_2/",
+parser.add_argument("--image-dir", default="eval/image_3/",
                     help="Relative path to the directory containing images to detect. Default \
                     is eval/image_2/")
 
@@ -57,7 +58,7 @@ parser.add_argument("--hide-debug", action="store_true",
                     help="Supress the printing of each 3d location")
 
 
-def plot_regressed_3d_bbox(img, cam_to_img, box_2d, dimensions, alpha, theta_ray, img_2d=None):
+def plot_regressed_3d_bbox(img, cam_to_img, box_2d, dimensions, alpha, theta_ray, img_id, img_2d=None):
 
     # the math! returns X, the corners used for constraint
     location, X = calc_location(dimensions, cam_to_img, box_2d, alpha, theta_ray)
@@ -67,7 +68,7 @@ def plot_regressed_3d_bbox(img, cam_to_img, box_2d, dimensions, alpha, theta_ray
     if img_2d is not None:
         plot_2d_box(img_2d, box_2d)
 
-    plot_3d_box(img, cam_to_img, orient, dimensions, location) # 3d boxes
+    plot_3d_box(img, cam_to_img, orient, dimensions, location, img_id) # 3d boxes
 
     return location
 
@@ -85,7 +86,7 @@ def main():
         print('Using previous model %s'%model_lst[-1])
         my_vgg = vgg.vgg19_bn(pretrained=True)
         # TODO: load bins from file or something
-        model = Model.Model(features=my_vgg.features, bins=2).cuda()
+        model = Model.Model(features=my_vgg.features, bins=2)
         checkpoint = torch.load(weights_path + '/%s'%model_lst[-1])
         model.load_state_dict(checkpoint['model_state_dict'])
         model.eval()
@@ -125,7 +126,7 @@ def main():
 
         start_time = time.time()
 
-        img_file = img_path + img_id + ".png"
+        img_file = img_path + img_id + ".jpg"
 
         # P for each frame
         # calib_file = calib_path + id + ".txt"
@@ -154,7 +155,7 @@ def main():
             box_2d = detection.box_2d
             detected_class = detection.detected_class
 
-            input_tensor = torch.zeros([1,3,224,224]).cuda()
+            input_tensor = torch.zeros([1,3,224,224])
             input_tensor[0,:,:,:] = input_img
 
             [orient, conf, dim] = model(input_tensor)
@@ -173,9 +174,9 @@ def main():
             alpha -= np.pi
 
             if FLAGS.show_yolo:
-                location = plot_regressed_3d_bbox(img, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img)
+                location = plot_regressed_3d_bbox(img, proj_matrix, box_2d, dim, alpha, theta_ray, img_id, truth_img)
             else:
-                location = plot_regressed_3d_bbox(img, proj_matrix, box_2d, dim, alpha, theta_ray)
+                location = plot_regressed_3d_bbox(img, proj_matrix, box_2d, dim, alpha, theta_ray, img_id)
 
             if not FLAGS.hide_debug:
                 print('Estimated pose: %s'%location)
@@ -191,11 +192,11 @@ def main():
             print('Got %s poses in %.3f seconds'%(len(detections), time.time() - start_time))
             print('-------------')
 
-        if FLAGS.video:
-            cv2.waitKey(1)
-        else:
-            if cv2.waitKey(0) != 32: # space bar
-                exit()
+        # if FLAGS.video:
+        #     cv2.waitKey(1)
+        # else:
+        #     if cv2.waitKey(0) != 32: # space bar
+        #          exit()
 
 if __name__ == '__main__':
     main()

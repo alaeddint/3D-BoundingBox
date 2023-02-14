@@ -24,15 +24,15 @@ def generate_bins(bins):
 class Dataset(data.Dataset):
     def __init__(self, path, bins=2, overlap=0.1):
 
-        self.top_label_path = path + "/label_2/"
-        self.top_img_path = path + "/image_2/"
-        self.top_calib_path = path + "/calib/"
+        self.top_label_path = "C:/Users/aturkmen/PycharmProjects/3D-BoundingBox/eval/label_3/"
+        self.top_img_path =  "C:/Users/aturkmen/PycharmProjects/3D-BoundingBox/eval/image_3/"
+        self.top_calib_path = "C:/Users/aturkmen/PycharmProjects/3D-BoundingBox/eval/calib/"
         # use a relative path instead?
 
         # TODO: which camera cal to use, per frame or global one?
         self.proj_matrix = get_P(os.path.abspath(os.path.dirname(os.path.dirname(__file__)) + '/camera_cal/calib_cam_to_cam.txt'))
 
-        self.ids = [x.split('.')[0] for x in sorted(os.listdir(self.top_img_path))] # name of file
+        self.ids = [x.split('.')[0] for x in sorted(os.listdir('C:/Users/aturkmen/PycharmProjects/3D-BoundingBox/eval/image_3'))] # name of file
         self.num_images = len(self.ids)
 
         # create angle bins
@@ -52,7 +52,8 @@ class Dataset(data.Dataset):
                                 (i*self.interval + self.interval + overlap) % (2*np.pi)) )
 
         # hold average dimensions
-        class_list = ['Car', 'Van', 'Truck', 'Pedestrian','Person_sitting', 'Cyclist', 'Tram', 'Misc']
+        # class_list = ['Car', 'Van', 'Truck', 'Pedestrian','Person_sitting', 'Cyclist', 'Tram', 'Misc']
+        class_list = ['Package']
         self.averages = ClassAverages(class_list)
 
         self.object_list = self.get_objects(self.ids)
@@ -82,7 +83,7 @@ class Dataset(data.Dataset):
 
         if id != self.curr_id:
             self.curr_id = id
-            self.curr_img = cv2.imread(self.top_img_path + '%s.png'%id)
+            self.curr_img = cv2.imread(self.top_img_path + '%s.jpg'%id)
 
         label = self.labels[id][str(line_num)]
         # P doesn't matter here
@@ -219,7 +220,7 @@ class Dataset(data.Dataset):
         data = {}
         for id in self.ids:
             data[id] = {}
-            img_path = self.top_img_path + '%s.png'%id
+            img_path = self.top_img_path + '%s.jpg'%id
             img = cv2.imread(img_path)
             data[id]['Image'] = img
 
